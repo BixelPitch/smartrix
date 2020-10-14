@@ -1,0 +1,22 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Erase flash",
+            "type": "shell",
+            "command": "esptool.py --port /dev/tty.SLAB_USBtoUART erase_flash"
+        },
+        {
+            "label": "Flash firmware",
+            "type": "shell",
+            "command": "esptool.py --chip esp32 --port /dev/tty.SLAB_USBtoUART write_flash -z 0x1000 esp32.bin"
+        },
+        {
+            "label": "Sync project",
+            "type": "shell",
+            "command": "rshell -p /dev/tty.SLAB_USBtoUART rsync -m src/. /pyboard/"
+        }
+    ]
+}
