@@ -72,9 +72,22 @@ export class Display {
     }
 
     start() {
+        const useMatrix = () => {
+            const setMatrix = (matrix: Matrix) => this.matrix = matrix;
+            return [new Matrix({ data: this.matrix.getData() }), setMatrix];
+        }
+
+        const buildUseContext = (pluginName: string) => {
+            const useContext = () => {
+                const setContext = (context: any) => this.contexts.set(pluginName, context);
+                return [this.contexts.get(pluginName), setContext];
+            }
+            return useContext;
+        }
+
         this.stopped = false;
 
-        let loop = async () => {
+        let loop = () => {
             if (!this.stopped) {
                 setTimeout(() => {
                     // on first run of a plugin, run the initialization function
@@ -82,21 +95,19 @@ export class Display {
                         this.contexts.set(this.getCurrentPlugin().name, this.getCurrentPlugin().init());
                     }
 
+                    let oldMatrix = new Matrix({ data: this.matrix.getData() });
+
                     // run the iteration
-                    const [matrix, ctx]: [Matrix, any] = this.getCurrentPlugin().iterate(this.matrix, this.contexts.get(this.getCurrentPlugin().name));
+                    this.getCurrentPlugin().iterate(useMatrix, buildUseContext(this.getCurrentPlugin().name));
+
+                    //const [matrix, ctx]: [Matrix, any] = this.getCurrentPlugin().iterate(this.matrix, this.contexts.get(this.getCurrentPlugin().name));
 
                     // call the callback function if the matrix has changed or alwaysUpdate is set
                     if (config.alwaysUpdate) {
                         this.callback();
                     } else {
-                        const oldMatrix = this.matrix;
-                        if (!oldMatrix.equals(matrix)) this.callback();
+                        if (!oldMatrix.equals(this.matrix)) this.callback();
                     }
-
-                    // update the matrix and the context
-                    this.matrix = matrix;
-                    this.contexts.set(this.getCurrentPlugin().name, ctx);
-
 
                     this.ticks++;
                     if (this.ticks % config.rotation === config.rotation - 1) this.iteratePluginPointer();

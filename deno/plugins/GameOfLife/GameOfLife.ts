@@ -37,20 +37,25 @@ export class GameOfLife implements Plugin {
         return 0;
     }
 
-    iterate = (matrix: Matrix, ctx: GameOfLifeCtx) => {
+    iterate = (useMatrix: any, useContext: any) => {
+        const [matrix, setMatrix]: [Matrix, Function] = useMatrix();
+        const [context, setContext]: [GameOfLifeCtx, Function] = useContext();
+
         let result = new Matrix({ width: matrix.width(), height: matrix.height() });
 
-        ctx.seed.getData().forEach((line, y) => {
+        context.seed.getData().forEach((line, y) => {
             line.forEach((pixel, x) => {
-                result.setPixel(x, y, this.evolution(pixel, this.getNeighbors(ctx.seed, x, y)));
+                result.setPixel(x, y, this.evolution(pixel, this.getNeighbors(context.seed, x, y)));
             });
         });
 
-        if (ctx.seed.equals(result)) {
+        if (context.seed.equals(result)) {
             result.fillRandom(80);
         }
 
-        ctx.seed = result;
-        return [result, ctx];
+        setContext({
+            seed: result
+        });
+        setMatrix(result);
     }
 }

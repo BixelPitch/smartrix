@@ -13,7 +13,10 @@ export class Clock implements Plugin {
         return { dots: false, lastDots: Date.now() };
     }
 
-    iterate = (matrix: Matrix, ctx: ClockCtx) => {
+    iterate = (useMatrix: any, useContext: any) => {
+        const [matrix, setMatrix]: [Matrix, Function] = useMatrix();
+        const [context, setContext]: [ClockCtx, Function] = useContext();
+
         let date = new Date();
         let dateString = '';
         let result = new Matrix({ width: 0, height: 8 });
@@ -28,12 +31,14 @@ export class Clock implements Plugin {
             result.glue(new Matrix({ data: this.getFigure(digit) }), Direction.RIGHT);
         });
 
-        if (Date.now() - ctx.lastDots > 1000) {
-            ctx.lastDots = Date.now();
-            ctx.dots = !ctx.dots;
+        if (Date.now() - context.lastDots > 1000) {
+            setContext({
+                lastDots: Date.now(),
+                dots: !context.dots
+            });
         }
 
-        if (ctx.dots) {
+        if (context.dots) {
             result.setPixel(15, 2, 1);
             result.setPixel(16, 2, 1);
             result.setPixel(15, 3, 1);
@@ -44,7 +49,7 @@ export class Clock implements Plugin {
             result.setPixel(16, 6, 1);
         }
 
-        return [result, ctx];
+        setMatrix(result);
     }
 
     getFigure(digit: string): Array<Array<number>> {
