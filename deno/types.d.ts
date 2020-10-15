@@ -1,5 +1,5 @@
 export interface Plugin {
     name: string;
-    iterate: Function;
-    init: Function;
+    iterate(useMatrix: Function, useContext: Function): void;
+    init(): any;
 }
