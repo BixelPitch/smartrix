@@ -12,6 +12,7 @@ Turn your MAX7219 matrix into a smart display with the power of micropython and 
 # Current plugins
 - clock
 - game of life
+- cpu monitor
 
 # Prerequisites
 - VSCode (optional but recommended)
