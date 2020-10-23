@@ -21,7 +21,7 @@ export class CPU implements Plugin {
     getLoad = async () => {
         if (Deno.build.os === 'darwin') {
             const run = await Deno.run({
-                cmd: [ 'top', '-l', '1' ],
+                cmd: [ 'top', '-F', '-R', '-l', '1' ],
                 stdout: 'piped',
                 stderr: 'piped',
             });
