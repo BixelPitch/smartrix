@@ -100,8 +100,6 @@ export class Display {
                     // run the iteration
                     this.getCurrentPlugin().iterate(useMatrix, buildUseContext(this.getCurrentPlugin().name));
 
-                    //const [matrix, ctx]: [Matrix, any] = this.getCurrentPlugin().iterate(this.matrix, this.contexts.get(this.getCurrentPlugin().name));
-
                     // call the callback function if the matrix has changed or alwaysUpdate is set
                     if (config.alwaysUpdate) {
                         this.callback();
