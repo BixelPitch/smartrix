@@ -37,10 +37,7 @@ export class GameOfLife implements Plugin {
         return 0;
     }
 
-    iterate = (useMatrix: any, useContext: any) => {
-        const [matrix, setMatrix]: [Matrix, Function] = useMatrix();
-        const [context, setContext]: [GameOfLifeCtx, Function] = useContext();
-
+    iterate = (matrix: Matrix, context: GameOfLifeCtx) => {
         const result = new Matrix({ width: matrix.width(), height: matrix.height() });
 
         context.seed.getData().forEach((line, y) => {
@@ -53,7 +50,6 @@ export class GameOfLife implements Plugin {
             result.fillRandom(80);
         }
 
-        setContext({ seed: result });
-        setMatrix(result);
+        return [result, { seed: result }];
     }
 }

@@ -4,19 +4,15 @@ import { Digits } from './Digits.ts';
 
 interface ClockCtx {
     dots: boolean;
-    lastDots: number;
 }
 
 export class Clock implements Plugin {
     name = 'clock';
     init = (): ClockCtx => {
-        return { dots: false, lastDots: Date.now() };
+        return { dots: false };
     }
 
-    iterate = (useMatrix: any, useContext: any) => {
-        const [matrix, setMatrix]: [Matrix, Function] = useMatrix();
-        const [context, setContext]: [ClockCtx, Function] = useContext();
-
+    iterate = (matrix: Matrix, context: ClockCtx) => {
         let date = new Date();
         let dateString = '';
         let result = new Matrix({ width: 0, height: 8 });
@@ -31,13 +27,6 @@ export class Clock implements Plugin {
             result.glue(new Matrix({ data: this.getFigure(digit) }), Direction.RIGHT);
         });
 
-        if (Date.now() - context.lastDots > 1000) {
-            setContext({
-                lastDots: Date.now(),
-                dots: !context.dots
-            });
-        }
-
         if (context.dots) {
             result.setPixel(15, 2, 1);
             result.setPixel(16, 2, 1);
@@ -49,7 +38,15 @@ export class Clock implements Plugin {
             result.setPixel(16, 6, 1);
         }
 
-        setMatrix(result);
+        return [ result, context ];
+    }
+
+    backgroundTask = (context: ClockCtx) => {
+        const promise = new Promise<ClockCtx>((resolve) => {
+            resolve({ dots: !context.dots });
+        });
+
+        return [ promise, 1000 ];
     }
 
     getFigure(digit: string): Array<Array<number>> {

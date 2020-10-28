@@ -21,14 +21,15 @@ Turn your MAX7219 matrix into a smart display with the power of micropython and 
 - [Deno](https://github.com/denoland/deno)
 
 # Getting started
+> In the next part ````<PORT>```` is referenced. This is your serial port, where your esp32 is connected to your computer. This information varies across the operating systems, but there are a lot tutorials out there which help you to find out, how your serial port is named.
 1. Download or clone this repository.
 2. Download the micropython firmware for your board and place this right beneath this readme file.
-3. Run the vscode task "Erase flash"
-4. Run the vscode task "Flash firmware"
-5. Edit the src/boot.py file and enter the SSID (The name of your wifi) and PASS (The password of your wifi)
-6. Run the vscode task "Sync project"
+3. Erase the flash on your esp32 with ````esptool.py --port <PORT> erase_flash````
+4. Now flash the firmware with ````esptool.py --chip esp32 --port <PORT> write_flash -z 0x1000 esp32.bin```` assuming you are in the directory, where you downloaded the firmware from step 2. In this example it is named esp32.bin.
+5. Edit the src/boot.py file and enter the SSID (The name of your wifi) and PASS (The password of your wifi).
+6. Copy the code to your esp32 with ````rshell -p <PORT> rsync -m src/. /pyboard/```` assuming your current directory is the root dir of this repository.
 7. Open up a console and navigate to the path where you extracted this repository
-8. run ````deno run --allow-net --allow-run deno/main.ts --host <host>```` where ````host```` is the ip of your esp32 board in your network
+8. run ````deno run --allow-net --allow-run deno/main.ts --host <host>```` where ````host```` is the ip of your esp32 board in your network.
 9. You should see someting on your LED matrix!
 
 # Optional configuration

@@ -3,6 +3,7 @@ import { Matrix } from './Matrix.ts';
 import { config } from '../config.ts'; 
 import { plugins } from '../plugins/Plugins.ts';
 import { Clock } from "../plugins/Clock/Clock.ts";
+import { EventEmitter } from "../depts.ts";
 
 const noop = () => {};
 
@@ -15,6 +16,8 @@ export class Display {
     private stopped: boolean;
     private ticks: number;
     private pluginPointer: number;
+    private event: EventEmitter;
+    private cost: number;
 
     constructor() {
         this.matrix = new Matrix({ height: 8, width: 32 });
@@ -25,10 +28,66 @@ export class Display {
         this.stopped = true;
         this.ticks = 0;
         this.pluginPointer = 0;
+        this.event = new EventEmitter();
+        this.registerEventListeners();
+        this.cost = 0;
+    }
+
+    private registerEventListeners() {
+        this.event.on('iteration', () => {
+            const startTime = Date.now();
+            let oldMatrix = new Matrix({ data: this.matrix.getData() });
+
+            // run the iteration
+            const [matrix, context] = this.getCurrentPlugin().iterate(new Matrix({ data: this.matrix.getData() }), this.contexts.get(this.getCurrentPlugin().name));
+            this.matrix = matrix;
+            this.contexts.set(this.getCurrentPlugin().name, context);
+
+            this.ticks++;
+            if (this.ticks % config.rotation === config.rotation - 1) this.iteratePluginPointer();
+
+            this.cost = Date.now() - startTime;
+
+            // call the callback function if the matrix has changed or alwaysUpdate is set
+            if (config.alwaysUpdate) {
+                this.callback();
+            } else {
+                if (!oldMatrix.equals(this.matrix)) this.callback();
+            }
+
+            if (!this.stopped) {
+                setTimeout(() => this.event.emit('iteration'), this.timeout);
+            }
+        });
+
+        this.event.on('backgroundTask', (plugin: Plugin) => {
+            if (!this.stopped && plugin.backgroundTask) {
+                const [promise, timeout] = plugin.backgroundTask(this.contexts.get(plugin.name));
+
+                promise
+                    .then((context: any) => {
+                        this.contexts.set(plugin.name, context);
+                        if (timeout <= 0) {
+                            this.event.emit('backgroundTask', plugin);
+                        }
+                    })
+                    .catch((e: Error) => console.error(e));
+
+                if (timeout > 0) {
+                    setTimeout(() => {
+                        this.event.emit('backgroundTask', plugin);
+                    }, timeout);
+                }
+            }
+        });
     }
 
     print() {
         this.matrix.print();
+    }
+
+    getCost(): number {
+        return this.cost;
     }
 
     setTimeout(timeout: number): void {
@@ -72,49 +131,16 @@ export class Display {
     }
 
     start() {
-        const useMatrix = () => {
-            const setMatrix = (matrix: Matrix) => this.matrix = matrix;
-            return [new Matrix({ data: this.matrix.getData() }), setMatrix];
-        }
-
-        const buildUseContext = (pluginName: string) => {
-            const useContext = () => {
-                const setContext = (context: any) => this.contexts.set(pluginName, context);
-                return [this.contexts.get(pluginName), setContext];
-            }
-            return useContext;
-        }
-
         this.stopped = false;
 
-        let loop = () => {
-            if (!this.stopped) {
-                setTimeout(() => {
-                    // on first run of a plugin, run the initialization function
-                    if (!this.contexts.get(this.getCurrentPlugin().name)) {
-                        this.contexts.set(this.getCurrentPlugin().name, this.getCurrentPlugin().init());
-                    }
+        this.plugins.forEach((plugin) => {
+            this.contexts.set(plugin.name, plugin.init());
 
-                    let oldMatrix = new Matrix({ data: this.matrix.getData() });
-
-                    // run the iteration
-                    this.getCurrentPlugin().iterate(useMatrix, buildUseContext(this.getCurrentPlugin().name));
-
-                    // call the callback function if the matrix has changed or alwaysUpdate is set
-                    if (config.alwaysUpdate) {
-                        this.callback();
-                    } else {
-                        if (!oldMatrix.equals(this.matrix)) this.callback();
-                    }
-
-                    this.ticks++;
-                    if (this.ticks % config.rotation === config.rotation - 1) this.iteratePluginPointer();
-
-                    loop();
-                }, this.timeout);
+            if (plugin.backgroundTask) {
+                this.event.emit('backgroundTask', plugin);
             }
-        }
+        });
 
-        loop();
+        this.event.emit('iteration');
     }
 }

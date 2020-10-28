@@ -1,5 +1,8 @@
+import { Matrix } from "./class/Matrix.ts";
+
 export interface Plugin {
     name: string;
-    iterate(useMatrix: Function, useContext: Function): void;
+    iterate(matrix: Matrix, context: any): any;
     init(): any;
+    backgroundTask?(context: any): any;
 }

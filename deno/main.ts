@@ -11,6 +11,7 @@ const print = async () => {
     clear.close();
     console.log(`mode: ${config.host ? `online (${config.host}:${config.port})` : 'offline'}`);
     console.log(`rate: ${config.rate} ms`);
+    console.log(`cost: ${display.getCost()} ms`);
     console.log(`tick: ${display.getTicks()} ${animation[display.getTicks() % animation.length]}`);
     display.print();
 }
