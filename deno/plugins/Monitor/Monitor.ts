@@ -2,7 +2,7 @@ import { Direction, Matrix } from '../../class/Matrix.ts';
 import { Plugin } from '../../types.d.ts';
 import { digits } from "./Digits.ts";
 
-interface CPUCtx {
+interface MonitorCtx {
     load: number;
 }
 
@@ -46,19 +46,19 @@ const buildMatrix = (load: number): Matrix => {
     return background;
 }
 
-export class CPU implements Plugin {
-    name = 'cpu';
+export class Monitor implements Plugin {
+    name = 'monitor';
 
-    init = (): CPUCtx => {
+    init = (): MonitorCtx => {
         return { load: 0 };
     }
 
-    iterate = (matrix: Matrix, context: CPUCtx) => {
+    iterate = (matrix: Matrix, context: MonitorCtx) => {
         return [ buildMatrix(context.load), context ];
     }
 
     backgroundTask = () => {
-        const promise = new Promise<CPUCtx>((resolve, reject) => {
+        const promise = new Promise<MonitorCtx>((resolve, reject) => {
             if (Deno.build.os === 'darwin') {
                 executeCommand([ 'top', '-F', '-R', '-l', '1' ], /(\d+\.\d+)\% idle/)
                 .then((result) => {
