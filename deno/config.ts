@@ -1,4 +1,4 @@
-import { parse, version } from './depts.ts';
+import { parse, version } from './deps.ts';
 import { Plugins } from './plugins/Plugins.ts';
 import { Plugin } from "./types.d.ts";
 
