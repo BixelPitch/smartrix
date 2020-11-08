@@ -1,7 +1,7 @@
 import { Plugin } from '../types.d.ts';
 import { Matrix } from './Matrix.ts';
 import { config } from '../config.ts'; 
-import { plugins } from '../plugins/Plugins.ts';
+import { Plugins } from '../plugins/Plugins.ts';
 import { Clock } from "../plugins/Clock/Clock.ts";
 import { EventEmitter } from "../depts.ts";
 
@@ -24,13 +24,24 @@ export class Display {
         this.callback = noop;
         this.timeout = config.rate;
         this.contexts = new Map();
-        this.plugins = plugins.length > 0 ? plugins : [ new Clock() ];
         this.stopped = true;
         this.ticks = 0;
         this.pluginPointer = 0;
         this.event = new EventEmitter();
         this.registerEventListeners();
         this.cost = 0;
+
+        let plugins = Plugins;
+
+        if (config.plugins.length > 0) {
+            [ ...plugins ].forEach((plugin) => {
+                if (!config.plugins.includes(plugin.name)) {
+                    plugins = plugins.filter(x => x.name !== plugin.name);
+                }
+            });
+        }
+        
+        this.plugins = plugins.length > 0 ? plugins : [ new Clock() ];
     }
 
     private registerEventListeners() {
