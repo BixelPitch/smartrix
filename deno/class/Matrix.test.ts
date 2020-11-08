@@ -1,4 +1,4 @@
-import { assertEquals } from '../depts.ts';
+import { assertEquals } from '../deps.ts';
 import { Matrix, Direction } from './Matrix.ts';
 
 Deno.test('if creating a Matrix object works', () => {
