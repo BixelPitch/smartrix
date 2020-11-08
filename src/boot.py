@@ -2,10 +2,7 @@ import max7219
 import network
 from machine import Pin, SPI
 from time import sleep
-
-# before flashing, set the SSID and the PASS for your network
-SSID = ''
-PASS = ''
+from wifi import *
 
 sck = Pin(18, Pin.OUT)
 mosi = Pin(23, Pin.OUT)
