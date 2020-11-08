@@ -132,9 +132,6 @@ export class Matrix {
     }
 
     place(m: Matrix, x: number, y: number, invert: boolean = false) {
-        //if (x + m.width() > this.width()) return;
-        //if (y + m.height() > this.height()) return;
-
         m.getData().forEach((line, cy) => {
             line.forEach((pixel, cx) => {
                 if (pixel === 1) {
