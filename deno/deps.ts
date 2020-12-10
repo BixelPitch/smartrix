@@ -1,4 +1,4 @@
-export const version = '0.2.0';
+export const version = '1.0.0';
 
 export { assertEquals, assertNotEquals } from 'https://deno.land/std/testing/asserts.ts';
 export { parse } from 'https://deno.land/std/flags/mod.ts';
