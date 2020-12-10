@@ -209,3 +209,16 @@ Deno.test('if place works', () => {
     ]);
 });
 
+Deno.test('if toUint8Array works', () => {
+    const m = new Matrix({ data: [
+        [ 0,0,0,0,0,0,0,1 ],
+        [ 0,0,0,0,0,0,1,0 ],
+        [ 0,0,1,0,1,0,0,0 ],
+        [ 1,1,0,0,0,0,0,0 ],
+    ] });
+
+    const result = [ 1, 2, 40, 192 ];
+    assertEquals(m.toUint8Array().every((value, i) => {
+        return value === result[i];
+    }), true);
+});

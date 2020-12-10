@@ -132,9 +132,6 @@ export class Matrix {
     }
 
     place(m: Matrix, x: number, y: number, invert: boolean = false) {
-        //if (x + m.width() > this.width()) return;
-        //if (y + m.height() > this.height()) return;
-
         m.getData().forEach((line, cy) => {
             line.forEach((pixel, cx) => {
                 if (pixel === 1) {
@@ -145,5 +142,18 @@ export class Matrix {
                 }
             });
         });
+    }
+
+    toUint8Array(): Uint8Array {
+        const bytesPerLine = Math.ceil(this.width() / 8);
+        let result = new Uint8Array(this.height() * bytesPerLine);
+
+        this.data.forEach((line, index) => {
+            for (let i = 0; i < bytesPerLine; i++) {
+                result[index * bytesPerLine + i] = parseInt(line.slice(i * 8, i * 8 + 8).join(''), 2);
+            }
+        });
+
+        return result;
     }
 }
