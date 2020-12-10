@@ -18,6 +18,7 @@ export class Display {
     private pluginPointer: number;
     private event: EventEmitter;
     private cost: number;
+    private brightness: number;
 
     constructor() {
         this.matrix = new Matrix({ height: 8, width: 32 });
@@ -30,6 +31,7 @@ export class Display {
         this.event = new EventEmitter();
         this.registerEventListeners();
         this.cost = 0;
+        this.brightness = 15;
 
         let plugins = Plugins;
 
@@ -93,6 +95,12 @@ export class Display {
         });
     }
 
+    setBrightness(brightness: number) {
+        if (brightness < 0) this.brightness = 0;
+        if (brightness > 15) this.brightness = 15
+        this.brightness = brightness;
+    }
+
     print() {
         this.matrix.print();
     }
@@ -121,8 +129,9 @@ export class Display {
         return this.ticks;
     }
 
-    serialize() {
-        return this.matrix.getData().reduce((p1, c1) => p1.toString() + c1.reduce((p2, c2) => p2 + c2.toString(), ''), '');      
+    serialize(): Uint8Array {
+        let serializedMatrix = this.matrix.toUint8Array();
+        return new Uint8Array([ this.brightness, ...serializedMatrix ]);
     }
 
     stop() {

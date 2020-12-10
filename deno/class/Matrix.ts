@@ -143,4 +143,17 @@ export class Matrix {
             });
         });
     }
+
+    toUint8Array(): Uint8Array {
+        const bytesPerLine = Math.ceil(this.width() / 8);
+        let result = new Uint8Array(this.height() * bytesPerLine);
+
+        this.data.forEach((line, index) => {
+            for (let i = 0; i < bytesPerLine; i++) {
+                result[index * bytesPerLine + i] = parseInt(line.slice(i * 8, i * 8 + 8).join(''), 2);
+            }
+        });
+
+        return result;
+    }
 }

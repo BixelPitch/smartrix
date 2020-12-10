@@ -1,7 +1,6 @@
 import { Display } from './class/Display.ts';
 import { config } from './config.ts';
 
-const encoder = new TextEncoder();
 const display = new Display();
 
 const print = async () => {
@@ -22,12 +21,10 @@ if (config.host) {
     console.log(`connecting to ${config.host}:${config.port}`);
     const conn = await Deno.connect({ hostname: config.host, port: config.port });
     console.log('connected!');
-
-    console.log(`setting brightness to ${config.brightness}`);
-    if (config.brightness != 15) await conn.write(encoder.encode('BRIG#' + display.serialize() + ';'));
+    display.setBrightness(config.brightness);
 
     callback = async () => {
-        await conn.write(encoder.encode('DATA#' + display.serialize() + ';'));
+        await conn.write(display.serialize());
         if (!config.disableLog) print();
     };
 }
