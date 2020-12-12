@@ -1,6 +1,6 @@
 import { Direction, Matrix } from '../../class/Matrix.ts';
 import { Plugin } from '../../types.d.ts';
-import { digits } from "./Digits.ts";
+import { digits } from './Digits.ts';
 
 interface MonitorCtx {
     load: number;

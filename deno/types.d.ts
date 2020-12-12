@@ -1,4 +1,4 @@
-import { Matrix } from "./class/Matrix.ts";
+import { Matrix } from './class/Matrix.ts';
 
 export interface Plugin {
     name: string;

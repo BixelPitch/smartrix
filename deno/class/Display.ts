@@ -2,8 +2,8 @@ import { Plugin } from '../types.d.ts';
 import { Matrix } from './Matrix.ts';
 import { config } from '../config.ts'; 
 import { Plugins } from '../plugins/Plugins.ts';
-import { Clock } from "../plugins/Clock/Clock.ts";
-import { EventEmitter } from "../deps.ts";
+import { Clock } from '../plugins/Clock/Clock.ts';
+import { EventEmitter } from '../deps.ts';
 
 const noop = () => {};
 
